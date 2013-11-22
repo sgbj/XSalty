@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSalty", "XSalty\XSalty.csproj", "{9E0BE7BD-F520-46DE-B860-AA268C798831}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSalty", "XSalty\XSalty.csproj", "{4C756DD6-23E2-40AF-BF99-72C7837D1140}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9E0BE7BD-F520-46DE-B860-AA268C798831}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9E0BE7BD-F520-46DE-B860-AA268C798831}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9E0BE7BD-F520-46DE-B860-AA268C798831}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9E0BE7BD-F520-46DE-B860-AA268C798831}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C756DD6-23E2-40AF-BF99-72C7837D1140}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C756DD6-23E2-40AF-BF99-72C7837D1140}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C756DD6-23E2-40AF-BF99-72C7837D1140}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C756DD6-23E2-40AF-BF99-72C7837D1140}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,113 +1,42 @@
 ﻿namespace XSalty
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
+    using RazorEngine;
+    using RazorEngine.Configuration;
+    using RazorEngine.Templating;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using System.Xml;
     using System.Xml.Linq;
     using System.Xml.XPath;
 
-    public class XSBuilder
-    {
-        private XSTransform Root { get; set; }
-
-        public XSTransform Map(string source, string destination, bool includeEverything = false)
-        {
-            Root = new XSTransform(null, source, destination, includeEverything);
-            return Root;
-        }
-
-        public string Transform(string xml)
-        {
-            var original = XDocument.Parse(xml);
-            var transformed = new XDocument(Root.Transform(original));
-            return transformed.ToString();
-        }
-
-        public static XSBuilder FromStylesheet(string stylesheet)
-        {
-            var builder = new XSBuilder();
-            return builder;
-        }
-    }
-
-    public class XSTransform
-    {
-        public XSTransform Root;
-        private List<XSTransform> Children = new List<XSTransform>();
-        private string Source;
-        private string Destination;
-        private bool IncludeEverything;
-
-        public XSTransform(XSTransform root, string source, string destination, bool includeEverything = false)
-        {
-            Root = root;
-            Source = source;
-            Destination = destination;
-            IncludeEverything = includeEverything;
-        }
-
-        public XSTransform Map(string source, string destination, bool includeEverything = false)
-        {
-            var transform = new XSTransform(this, source, destination, includeEverything);
-            Children.Add(transform);
-            return destination.StartsWith("@") ? this : transform;
-        }
-
-        public XSTransform Parent()
-        {
-            return Root;
-        }
-
-        public IEnumerable<XObject> Transform(XObject o)
-        {
-            var matches = ((XNode)o).XPathEvaluate(Source);
-            if (matches is IEnumerable && !(matches is string))
-            {
-                foreach (XObject match in (IEnumerable)matches)
-                {
-                    if (Source.XPathParts().Last().StartsWith("@"))
-                    {
-
-                        yield return Destination.StartsWith("@") ? (XObject)
-                            new XAttribute(Destination.TrimStart('@'), ((XAttribute)match).Value) :
-                            new XElement(Destination, ((XAttribute)match).Value);
-                    }
-
-                    else
-                    {
-
-                        yield return Destination.StartsWith("@") ? (XObject)
-                            new XAttribute(Destination.TrimStart('@'), ((XElement)match).Value) :
-                            IncludeEverything ?
-                                new XElement((XElement)match) :
-                                new XElement(Destination, Children.SelectMany(c => c.Transform(match)));
-                    }
-                }
-            }
-            else
-            {
-                yield return Destination.StartsWith("@") ? (XObject)
-                    new XAttribute(Destination.TrimStart('@'), matches) :
-                    new XElement(Destination, Children.SelectMany(c => c.Transform(o)).Concat(new[] { new XText(matches.ToString()) }));
-            }
-        }
-    }
-
     public static class XSaltyUtility
     {
-        public static string[] XPathParts(this string xpath)
+        public static string XSalty(this XDocument doc, string template)
         {
-            return xpath.Trim('/').Split('/');
+            var config = new TemplateServiceConfiguration { BaseTemplateType = typeof(XSaltyTemplate<>) };
+            var service = new TemplateService(config);
+            Razor.SetTemplateService(service);
+            return Razor.Parse(template, doc);
+        }
+    }
+
+    public abstract class XSaltyTemplate<T> : TemplateBase<T> where T : XDocument
+    {
+        public dynamic Eval(string xpath)
+        {
+            var namespaceManager = new XmlNamespaceManager(new NameTable());
+            foreach (var element in Model.Descendants())
+                foreach (var attribute in element.Attributes().Where(a => a.IsNamespaceDeclaration))
+                    namespaceManager.AddNamespace(attribute.Name.LocalName, XNamespace.Get(attribute.Value).NamespaceName);
+            return Model.XPathEvaluate(xpath, namespaceManager);
         }
 
-        public static XSBuilder XSalty(this XDocument document)
+        public dynamic Eval(XNode node, string xpath)
         {
-            return new XSBuilder();
+            var namespaceManager = new XmlNamespaceManager(new NameTable());
+            foreach (var element in Model.Descendants())
+                foreach (var attribute in element.Attributes().Where(a => a.IsNamespaceDeclaration))
+                    namespaceManager.AddNamespace(attribute.Name.LocalName, XNamespace.Get(attribute.Value).NamespaceName);
+            return node.XPathEvaluate(xpath, namespaceManager);
         }
     }
 }
