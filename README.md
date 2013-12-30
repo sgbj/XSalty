@@ -5,7 +5,6 @@ XSalty is a lightweight API for performing XSLT transformations with Razor synta
 Example
 -------
 Using XSalty is easy:
-
 ```csharp
 var doc =
     new XDocument(
@@ -43,7 +42,6 @@ Console.WriteLine(output);
 ```
             
 Output:
-
 ```html
 <!doctype html>
 <html>
